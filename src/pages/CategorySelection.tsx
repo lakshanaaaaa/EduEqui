@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { Eye, Ear, Accessibility, Brain, ArrowLeft } from "lucide-react";
+import { Eye, Ear, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AccessibilityToolbar from "@/components/AccessibilityToolbar";
 import CategoryCard from "@/components/CategoryCard";
-import { speakWithTTS } from "@/lib/tts";
-import { useEffect } from "react";
 
 const categories = [
   {
@@ -24,54 +22,13 @@ const categories = [
     description: "Visual learning with sign language support and text transcripts",
     icon: Ear,
   },
-  {
-    id: "mobility",
-    title: "Mobility Impairment",
-    titleTamil: "நடமாட்ட குறைபாடு",
-    description: "Hands-free navigation with voice commands and gaze tracking",
-    icon: Accessibility,
-  },
-  {
-    id: "cognitive",
-    title: "Cognitive Disabilities",
-    titleTamil: "அறிவாற்றல் குறைபாடு",
-    description: "Simplified content, visual aids, and adaptive learning pace",
-    icon: Brain,
-  },
 ];
 
 const CategorySelection = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Bilingual welcome message
-    const welcomeMessage = async () => {
-      await speakWithTTS({
-        text: "Please select your accessibility requirement. Choose from the following categories: Blind or Visually Impaired, Deaf or Hard of Hearing, Mobility Impairment, or Cognitive Disabilities.",
-        languageCode: 'en-US'
-      });
-      
-      // Tamil translation after a delay
-      setTimeout(async () => {
-        await speakWithTTS({
-          text: "உங்கள் அணுகல் தேவையைத் தேர்ந்தெடுக்கவும். பின்வரும் வகைகளிலிருந்து தேர்வு செய்யவும்: குருட்டுத்தன்மை அல்லது பார்வைக் குறைபாடு, செவிட்டு அல்லது கேட்கும் குறைபாடு, இயக்கக் குறைபாடு அல்லது அறிவாற்றல் குறைபாடு.",
-          languageCode: 'ta-IN'
-        });
-      }, 5000);
-    };
-
-    welcomeMessage();
-  }, []);
-
   const handleCategorySelect = (categoryId: string) => {
     navigate("/language", { state: { category: categoryId } });
-  };
-
-  const speakCategory = async (text: string) => {
-    await speakWithTTS({
-      text,
-      languageCode: 'en-US' // Default to English for category descriptions
-    });
   };
 
   return (
@@ -110,7 +67,6 @@ const CategorySelection = () => {
               {categories.map((category) => (
                 <div 
                   key={category.id}
-                  onMouseEnter={() => speakCategory(`${category.title}. ${category.description}`)}
                   onClick={() => handleCategorySelect(category.id)}
                 >
                   <CategoryCard

@@ -1,7 +1,7 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import VoiceButton from "./VoiceButton";
 import { speakWithTTS } from "@/lib/tts";
 
 interface CategoryCardProps {
@@ -12,8 +12,6 @@ interface CategoryCardProps {
   onClick: () => void;
 }
 
-import { useRef } from 'react';
-
 const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: CategoryCardProps) => {
   const isSpeakingRef = useRef(false);
   
@@ -23,11 +21,10 @@ const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: C
     isSpeakingRef.current = true;
     speakWithTTS({
       text: `${title}. ${description}`,
-      languageCode: 'en-US', // Using English for category descriptions
-      force: true // Stop any current speech
+      languageCode: 'en-US',
+      force: true
     })
     .finally(() => {
-      // Reset the flag after a delay to prevent rapid re-triggering
       setTimeout(() => {
         isSpeakingRef.current = false;
       }, 1000);
@@ -67,11 +64,6 @@ const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: C
             <h4 className="text-2xl font-bold mb-2">{title}</h4>
             <p className="text-lg text-muted-foreground">{description}</p>
           </div>
-          
-          <VoiceButton 
-            englishText={`${title}. ${description}`}
-            tamilText={`${titleTamil}. ${description}`}
-          />
         </div>
       </Card>
     </motion.div>
