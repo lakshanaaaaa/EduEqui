@@ -16,7 +16,7 @@ const Home = () => {
     const greetUser = async () => {
       // Speak English first
       await speakWithTTS({
-        text: "Welcome to SahayLearn AI! Education for everyone.",
+        text: "Welcome to EduEqui AI! Education for everyone.",
         languageCode: 'en-US'
       });
       

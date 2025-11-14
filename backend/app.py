@@ -18,6 +18,7 @@ def text_to_speech():
         return response
 
     try:
+        
         data = request.get_json()
         if not data:
             return jsonify({'error': 'No data provided'}), 400
