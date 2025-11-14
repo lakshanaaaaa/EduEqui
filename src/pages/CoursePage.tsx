@@ -1,86 +1,45 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Pause, ArrowLeft, BookOpen } from "lucide-react";
+import { Play, Pause, ArrowLeft, BookOpen, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AccessibilityToolbar from "@/components/AccessibilityToolbar";
 import VoiceButton from "@/components/VoiceButton";
-
-const courseContents: Record<string, { title: string; titleTamil: string; content: string; contentTamil: string }> = {
-  math: {
-    title: "Introduction to Mathematics",
-    titleTamil: "கணிதத்தின் அறிமுகம்",
-    content: `
-      Mathematics is the science of numbers, quantities, and shapes. 
-      It helps us understand patterns and solve problems in everyday life.
-      From counting money to measuring ingredients for cooking, math is everywhere!
-    `,
-    contentTamil: `
-      கணிதம் என்பது எண்கள், அளவுகள் மற்றும் வடிவங்களின் அறிவியல்.
-      இது வடிவங்களைப் புரிந்துகொள்ளவும் அன்றாட வாழ்வில் பிரச்சனைகளைத் தீர்க்கவும் உதவுகிறது.
-      பணத்தை எண்ணுவது முதல் சமையலுக்கான பொருட்களை அளவிடுவது வரை, கணிதம் எல்லா இடத்திலும் உள்ளது!
-    `,
-  },
-  science: {
-    title: "Introduction to Science",
-    titleTamil: "அறிவியலின் அறிமுகம்",
-    content: `
-      Science is the systematic study of the natural world through observation and experimentation.
-      It helps us understand how things work, from the smallest particles to the vast universe.
-      Science is all around us - in the food we eat, the air we breathe, and the technology we use!
-    `,
-    contentTamil: `
-      அறிவியல் என்பது கவனிப்பு மற்றும் சோதனைகள் மூலம் இயற்கை உலகத்தை முறையாக ஆய்வு செய்வது.
-      இது எல்லாம் எவ்வாறு செயல்படுகின்றன என்பதைப் புரிந்துகொள்ள உதவுகிறது, சிறிய துகள்கள் முதல் விண்வெளி வரை.
-      அறிவியல் நம்மைச் சுற்றியுள்ளது - நாம் உண்ணும் உணவில், நாம் சுவாசிக்கும் காற்றில், நாம் பயன்படுத்தும் தொழில்நுட்பத்தில்!
-    `,
-  },
-  language: {
-    title: "Introduction to Language Arts",
-    titleTamil: "மொழி கலைகளின் அறிமுகம்",
-    content: `
-      Language Arts is the study of reading, writing, speaking, and listening.
-      It helps us communicate effectively and express our thoughts and ideas clearly.
-      Through stories, poetry, and literature, we explore new worlds and understand different perspectives!
-    `,
-    contentTamil: `
-      மொழி கலைகள் என்பது வாசிப்பு, எழுதுதல், பேசுதல் மற்றும் கேட்டல் பற்றிய ஆய்வு.
-      இது நமக்கு திறம்பட தொடர்பு கொள்ளவும் நமது எண்ணங்கள் மற்றும் கருத்துகளை தெளிவாக வெளிப்படுத்தவும் உதவுகிறது.
-      கதைகள், கவிதைகள் மற்றும் இலக்கியம் மூலம், நாம் புதிய உலகங்களை ஆராய்கிறோம் மற்றும் வெவ்வேறு பார்வைகளைப் புரிந்துகொள்கிறோம்!
-    `,
-  },
-  history: {
-    title: "Introduction to History",
-    titleTamil: "வரலாற்றின் அறிமுகம்",
-    content: `
-      History is the study of past events, people, and civilizations.
-      It helps us understand how the world has changed over time and learn from the experiences of those who came before us.
-      By studying history, we can better understand the present and make informed decisions about the future!
-    `,
-    contentTamil: `
-      வரலாறு என்பது கடந்த கால நிகழ்வுகள், மக்கள் மற்றும் நாகரிகங்களைப் பற்றிய ஆய்வு.
-      இது காலப்போக்கில் உலகம் எவ்வாறு மாறியுள்ளது என்பதைப் புரிந்துகொள்ளவும் நமக்கு முன் வந்தவர்களின் அனுபவங்களிலிருந்து கற்றுக்கொள்ளவும் உதவுகிறது.
-      வரலாற்றைப் படிப்பதன் மூலம், நாம் தற்போதைய நிலையை சிறப்பாக புரிந்துகொண்டு எதிர்காலத்தைப் பற்றி நன்கு தெரிந்த முடிவுகளை எடுக்க முடியும்!
-    `,
-  },
-};
+import { useCourse, useLessons, type Lesson } from "@/hooks/useAdminApi";
 
 const CoursePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { courseId: paramCourseId } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
 
-  const courseId = location.state?.courseId || "math";
-  const courseContent = courseContents[courseId] || courseContents.math;
+  // Get courseId from params, location state, or default
+  const courseId = paramCourseId || location.state?.courseId || null;
+
+  // Fetch course data with lessons
+  const { data: course, isLoading: courseLoading, error: courseError } = useCourse(courseId);
+  const { data: lessons = [], isLoading: lessonsLoading } = useLessons(courseId || undefined);
+
+  // Set first lesson as selected by default
+  useEffect(() => {
+    if (lessons.length > 0 && !selectedLessonId) {
+      setSelectedLessonId(lessons[0].id);
+    }
+  }, [lessons, selectedLessonId]);
+
+  // Get selected lesson data
+  const selectedLesson = lessons.find((l: Lesson) => l.id === selectedLessonId) || lessons[0];
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
     
-    if (!isPlaying && 'speechSynthesis' in window) {
-      const text = `${courseContent.contentTamil} ${courseContent.content}`;
+    if (!isPlaying && selectedLesson && 'speechSynthesis' in window) {
+      const text = `${selectedLesson.contentTamil || ''} ${selectedLesson.content || ''}`;
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;
       window.speechSynthesis.speak(utterance);
@@ -90,7 +49,60 @@ const CoursePage = () => {
   };
 
   const handleTakeQuiz = () => {
-    navigate("/quiz", { state: { courseId: location.state?.courseId } });
+    if (selectedLesson?.quizId) {
+      navigate("/quiz", { state: { quizId: selectedLesson.quizId, courseId } });
+    } else {
+      // Navigate to course quiz if available
+      navigate("/quiz", { state: { courseId } });
+    }
+  };
+
+  if (courseLoading || lessonsLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading course content...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (courseError || !course) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Card className="p-8">
+            <CardHeader>
+              <CardTitle>Course Not Found</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                The course you're looking for doesn't exist or couldn't be loaded.
+              </p>
+              <Button onClick={() => navigate("/dashboard")}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const lessonContent = selectedLesson || {
+    title: course.title,
+    titleTamil: course.titleTamil,
+    content: course.description,
+    contentTamil: "",
+    video: null,
   };
 
   return (
@@ -99,7 +111,7 @@ const CoursePage = () => {
       <AccessibilityToolbar />
       
       <main className="flex-1 py-12 px-4">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -122,85 +134,156 @@ const CoursePage = () => {
             <div className="text-center mb-12">
               <BookOpen className="w-16 h-16 text-primary mx-auto mb-4" aria-hidden="true" />
               <h1 className="text-4xl md:text-5xl font-bold mb-2 text-primary">
-                {courseContent.titleTamil}
+                {course.titleTamil || course.title}
               </h1>
               <h2 className="text-3xl font-bold text-muted-foreground">
-                {courseContent.title}
+                {course.title}
               </h2>
+              <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
+                {course.description}
+              </p>
             </div>
 
-            {/* Audio Player Section */}
-            <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl shadow-elegant">
-              <div className="flex flex-col items-center gap-6">
-                <h3 className="text-2xl font-bold">Audio Lesson / ஒலி பாடம்</h3>
-                
-                <Button
-                  onClick={handlePlayPause}
-                  size="lg"
-                  className="w-32 h-32 rounded-full text-2xl shadow-glow"
-                  aria-label={isPlaying ? "Pause audio lesson" : "Play audio lesson"}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-12 h-12" aria-hidden="true" />
-                  ) : (
-                    <Play className="w-12 h-12 ml-2" aria-hidden="true" />
-                  )}
-                </Button>
-                
-                <p className="text-xl text-center text-muted-foreground">
-                  {isPlaying ? "Playing... / இயங்குகிறது..." : "Click to listen / கேட்க கிளிக் செய்யவும்"}
-                </p>
-              </div>
-            </Card>
+            {/* Lessons Navigation */}
+            {lessons.length > 0 && (
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle>Lessons / பாடங்கள்</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {lessons.map((lesson: Lesson, index: number) => (
+                      <Button
+                        key={lesson.id}
+                        variant={selectedLessonId === lesson.id ? "default" : "outline"}
+                        className="w-full justify-start text-left"
+                        onClick={() => setSelectedLessonId(lesson.id)}
+                      >
+                        <span className="mr-2 font-semibold">{index + 1}.</span>
+                        <span>{lesson.titleTamil || lesson.title}</span>
+                        <ChevronRight className="w-4 h-4 ml-auto" />
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Text Content Section */}
-            <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl">
-              <div className="flex justify-between items-start mb-6">
-                <h3 className="text-2xl font-bold">Lesson Content / பாட உள்ளடக்கம்</h3>
-                <VoiceButton 
-                  englishText={courseContent.content}
-                  tamilText={courseContent.contentTamil}
-                />
-              </div>
-              
-              <div className="space-y-6">
-                <div className="p-6 bg-primary/5 rounded-2xl">
-                  <p className="text-xl leading-relaxed text-foreground font-medium">
-                    {courseContent.contentTamil}
-                  </p>
+            {/* Lesson Content */}
+            {selectedLesson && (
+              <>
+                {/* Lesson Title */}
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold mb-2">
+                    {lessonContent.titleTamil || lessonContent.title}
+                  </h2>
+                  <h3 className="text-2xl text-muted-foreground">
+                    {lessonContent.title}
+                  </h3>
                 </div>
-                
-                <div className="p-6 bg-accent/5 rounded-2xl">
-                  <p className="text-xl leading-relaxed text-foreground">
-                    {courseContent.content}
+
+                {/* Audio Player Section */}
+                <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl shadow-elegant">
+                  <div className="flex flex-col items-center gap-6">
+                    <h3 className="text-2xl font-bold">Audio Lesson / ஒலி பாடம்</h3>
+                    
+                    <Button
+                      onClick={handlePlayPause}
+                      size="lg"
+                      className="w-32 h-32 rounded-full text-2xl shadow-glow"
+                      aria-label={isPlaying ? "Pause audio lesson" : "Play audio lesson"}
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-12 h-12" aria-hidden="true" />
+                      ) : (
+                        <Play className="w-12 h-12 ml-2" aria-hidden="true" />
+                      )}
+                    </Button>
+                    
+                    <p className="text-xl text-center text-muted-foreground">
+                      {isPlaying ? "Playing... / இயங்குகிறது..." : "Click to listen / கேட்க கிளிக் செய்யவும்"}
+                    </p>
+                  </div>
+                </Card>
+
+                {/* Text Content Section */}
+                <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl">
+                  <div className="flex justify-between items-start mb-6">
+                    <h3 className="text-2xl font-bold">Lesson Content / பாட உள்ளடக்கம்</h3>
+                    <VoiceButton 
+                      englishText={lessonContent.content || ""}
+                      tamilText={lessonContent.contentTamil || ""}
+                    />
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {lessonContent.contentTamil && (
+                      <div className="p-6 bg-primary/5 rounded-2xl">
+                        <p className="text-xl leading-relaxed text-foreground font-medium">
+                          {lessonContent.contentTamil}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {lessonContent.content && (
+                      <div className="p-6 bg-accent/5 rounded-2xl">
+                        <p className="text-xl leading-relaxed text-foreground">
+                          {lessonContent.content}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+
+                {/* ISL Video Section */}
+                {selectedLesson.video && (
+                  <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl">
+                    <h3 className="text-2xl font-bold mb-4">
+                      Sign Language Video / சைகை மொழி வீடியோ
+                    </h3>
+                    <div className="bg-muted/50 rounded-2xl aspect-video overflow-hidden">
+                      <video
+                        controls
+                        className="w-full h-full"
+                        src={selectedLesson.video.islVideoUrl || selectedLesson.video.videoUrl}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                    {selectedLesson.video.description && (
+                      <p className="text-muted-foreground mt-4">
+                        {selectedLesson.video.description}
+                      </p>
+                    )}
+                  </Card>
+                )}
+
+                {/* Take Quiz Button */}
+                {selectedLesson.quizId && (
+                  <div className="text-center mb-8">
+                    <Button
+                      onClick={handleTakeQuiz}
+                      size="lg"
+                      className="text-2xl py-8 px-12 rounded-3xl shadow-elegant"
+                      aria-label="Take quiz to test your knowledge"
+                    >
+                      Take Quiz / வினாடி வினா எடுங்கள்
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* No lessons message */}
+            {lessons.length === 0 && (
+              <Card className="p-8">
+                <CardContent className="text-center">
+                  <p className="text-xl text-muted-foreground">
+                    No lessons available for this course yet.
                   </p>
-                </div>
-              </div>
-            </Card>
-
-            {/* ISL Video Placeholder */}
-            <Card className="p-8 mb-8 gradient-card border-2 border-primary/20 rounded-3xl">
-              <h3 className="text-2xl font-bold mb-4">
-                Sign Language Video / சைகை மொழி வீடியோ
-              </h3>
-              <div className="bg-muted/50 rounded-2xl aspect-video flex items-center justify-center">
-                <p className="text-xl text-muted-foreground">
-                  ISL Video Placeholder
-                </p>
-              </div>
-            </Card>
-
-            {/* Take Quiz Button */}
-            <div className="text-center">
-              <Button
-                onClick={handleTakeQuiz}
-                size="lg"
-                className="text-2xl py-8 px-12 rounded-3xl shadow-elegant"
-                aria-label="Take quiz to test your knowledge"
-              >
-                Take Quiz / வினாடி வினா எடுங்கள்
-              </Button>
-            </div>
+                </CardContent>
+              </Card>
+            )}
           </motion.div>
         </div>
       </main>

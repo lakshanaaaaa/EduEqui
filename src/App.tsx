@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import CategorySelection from "./pages/CategorySelection";
 import LanguageSelect from "./pages/LanguageSelect";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import CoursePage from "./pages/CoursePage";
 import QuizPage from "./pages/QuizPage";
 import ResultPage from "./pages/ResultPage";
@@ -28,7 +29,9 @@ const App = () => (
             <Route path="/category" element={<CategorySelection />} />
             <Route path="/language" element={<LanguageSelect />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/course" element={<CoursePage />} />
+            <Route path="/course/:courseId" element={<CoursePage />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/result" element={<ResultPage />} />
             <Route path="/settings" element={<Settings />} />
