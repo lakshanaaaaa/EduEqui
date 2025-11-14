@@ -4,20 +4,35 @@ interface TTSOptions {
   text: string;
   languageCode: string;
   force?: boolean; // If true, will interrupt current speech
+  speed?: number; // Speech speed multiplier (0.5 to 2.0, default 1.0)
 }
 
 // Global queue for TTS requests
-const ttsQueue: Array<{text: string, languageCode: string}> = [];
+const ttsQueue: Array<{text: string, languageCode: string, speed?: number}> = [];
 let isPlaying = false;
 let currentAudio: HTMLAudioElement | null = null;
 let isInitialized = false;
 const queuedSpeeches = new Set<string>(); // Track queued speeches to prevent duplicates
 
+// Get default TTS speed from localStorage
+const getDefaultSpeed = (): number => {
+  try {
+    const stored = localStorage.getItem("eduequi-settings");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.ttsSpeed || 1.0;
+    }
+  } catch (error) {
+    console.error("Failed to load TTS speed from settings:", error);
+  }
+  return 1.0;
+};
+
 const processQueue = async (): Promise<void> => {
   if (isPlaying || ttsQueue.length === 0) return;
   
   isPlaying = true;
-  const { text, languageCode } = ttsQueue.shift()!;
+  const { text, languageCode, speed } = ttsQueue.shift()!;
   
   // Skip if this exact text is already in the queue
   if (queuedSpeeches.has(text)) {
@@ -60,6 +75,10 @@ const processQueue = async (): Promise<void> => {
       const audio = new Audio(audioUrl);
       currentAudio = audio;
       
+      // Apply speed setting (use provided speed or default from settings)
+      const playbackSpeed = speed ?? getDefaultSpeed();
+      audio.playbackRate = Math.max(0.5, Math.min(2.0, playbackSpeed));
+      
       // Set up cleanup and queue processing for next item
       const cleanup = () => {
         if (currentAudio === audio) {
@@ -97,7 +116,7 @@ const processQueue = async (): Promise<void> => {
   }
 };
 
-export const speakWithTTS = async ({ text, languageCode, force = false }: TTSOptions): Promise<void> => {
+export const speakWithTTS = async ({ text, languageCode, force = false, speed }: TTSOptions): Promise<void> => {
   if (!text) return;
   
   // If force is true, stop current playback and clear queue
@@ -110,8 +129,9 @@ export const speakWithTTS = async ({ text, languageCode, force = false }: TTSOpt
     return;
   }
   
-  // Add to queue
-  ttsQueue.push({ text, languageCode });
+  // Add to queue with speed (use provided or default from settings)
+  const ttsSpeed = speed ?? getDefaultSpeed();
+  ttsQueue.push({ text, languageCode, speed: ttsSpeed });
   
   // Process queue if not already processing
   if (!isPlaying) {

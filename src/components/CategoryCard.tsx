@@ -10,9 +10,25 @@ interface CategoryCardProps {
   description: string;
   icon: LucideIcon;
   onClick: () => void;
+  colorClass?: string;
+  textColor?: string;
+  iconBg?: string;
+  iconColor?: string;
+  borderColor?: string;
 }
 
-const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: CategoryCardProps) => {
+const CategoryCard = ({ 
+  title, 
+  titleTamil, 
+  description, 
+  icon: Icon, 
+  onClick,
+  colorClass = "gradient-blue",
+  textColor = "text-blue",
+  iconBg = "bg-blue/10",
+  iconColor = "text-blue",
+  borderColor = "border-blue/30"
+}: CategoryCardProps) => {
   const isSpeakingRef = useRef(false);
   
   const handleHover = () => {
@@ -46,7 +62,7 @@ const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: C
       onFocus={handleHover}
     >
       <Card
-        className="p-8 gradient-card cursor-pointer hover:shadow-elegant transition-all border-2 border-primary/20 rounded-3xl"
+        className={`p-8 bg-card cursor-pointer hover:shadow-elegant transition-all border-2 ${borderColor} rounded-3xl relative overflow-hidden`}
         onClick={onClick}
         onMouseEnter={handleHover}
         role="button"
@@ -54,14 +70,15 @@ const CategoryCard = ({ title, titleTamil, description, icon: Icon, onClick }: C
         onKeyDown={(e) => e.key === 'Enter' && onClick()}
         aria-label={`${title} - ${description}`}
       >
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="p-6 bg-primary/10 rounded-full">
-            <Icon className="w-16 h-16 text-primary" aria-hidden="true" />
+        <div className={`absolute inset-0 ${colorClass} opacity-5`}></div>
+        <div className="relative flex flex-col items-center text-center gap-4">
+          <div className={`p-6 ${iconBg} rounded-full`}>
+            <Icon className={`w-16 h-16 ${iconColor}`} aria-hidden="true" />
           </div>
           
           <div>
-            <h3 className="text-2xl font-bold text-primary mb-1">{titleTamil}</h3>
-            <h4 className="text-2xl font-bold mb-2">{title}</h4>
+            <h3 className={`text-2xl font-bold ${textColor} mb-1`}>{titleTamil}</h3>
+            <h4 className={`text-2xl font-bold ${textColor} mb-2`}>{title}</h4>
             <p className="text-lg text-muted-foreground">{description}</p>
           </div>
         </div>

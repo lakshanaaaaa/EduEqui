@@ -64,20 +64,55 @@ const CategorySelection = () => {
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {categories.map((category) => (
-                <div 
-                  key={category.id}
-                  onClick={() => handleCategorySelect(category.id)}
-                >
-                  <CategoryCard
-                    title={category.title}
-                    titleTamil={category.titleTamil}
-                    description={category.description}
-                    icon={category.icon}
-                    onClick={() => {}}
-                  />
-                </div>
-              ))}
+              {categories.map((category, index) => {
+                const colorSchemes = [
+                  {
+                    colorClass: "gradient-blue",
+                    textColor: "text-blue",
+                    iconBg: "bg-blue/10",
+                    iconColor: "text-blue",
+                    borderColor: "border-blue/30"
+                  },
+                  {
+                    colorClass: "gradient-purple",
+                    textColor: "text-purple",
+                    iconBg: "bg-purple/10",
+                    iconColor: "text-purple",
+                    borderColor: "border-purple/30"
+                  },
+                  {
+                    colorClass: "gradient-orange",
+                    textColor: "text-orange",
+                    iconBg: "bg-orange/10",
+                    iconColor: "text-orange",
+                    borderColor: "border-orange/30"
+                  },
+                  {
+                    colorClass: "gradient-green",
+                    textColor: "text-green",
+                    iconBg: "bg-green/10",
+                    iconColor: "text-green",
+                    borderColor: "border-green/30"
+                  }
+                ];
+                const colors = colorSchemes[index % colorSchemes.length];
+                
+                return (
+                  <div 
+                    key={category.id}
+                    onClick={() => handleCategorySelect(category.id)}
+                  >
+                    <CategoryCard
+                      title={category.title}
+                      titleTamil={category.titleTamil}
+                      description={category.description}
+                      icon={category.icon}
+                      onClick={() => {}}
+                      {...colors}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         </div>

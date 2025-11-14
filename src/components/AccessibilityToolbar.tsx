@@ -1,26 +1,20 @@
-import { useState } from "react";
 import { ZoomIn, ZoomOut, Contrast } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const AccessibilityToolbar = () => {
-  const [fontSize, setFontSize] = useState(20);
-  const [highContrast, setHighContrast] = useState(false);
+  const { settings, updateFontSize, updateHighContrast } = useSettings();
 
   const increaseFontSize = () => {
-    const newSize = Math.min(fontSize + 2, 32);
-    setFontSize(newSize);
-    document.documentElement.style.fontSize = `${newSize}px`;
+    updateFontSize(settings.fontSize + 2);
   };
 
   const decreaseFontSize = () => {
-    const newSize = Math.max(fontSize - 2, 18);
-    setFontSize(newSize);
-    document.documentElement.style.fontSize = `${newSize}px`;
+    updateFontSize(settings.fontSize - 2);
   };
 
   const toggleHighContrast = () => {
-    setHighContrast(!highContrast);
-    document.documentElement.classList.toggle("high-contrast");
+    updateHighContrast(!settings.highContrast);
   };
 
   return (
@@ -47,11 +41,11 @@ const AccessibilityToolbar = () => {
       
       <Button
         onClick={toggleHighContrast}
-        variant={highContrast ? "default" : "outline"}
+        variant={settings.highContrast ? "default" : "outline"}
         size="icon"
-        className={highContrast ? "" : "hover:bg-primary hover:text-primary-foreground"}
+        className={settings.highContrast ? "" : "hover:bg-primary hover:text-primary-foreground"}
         aria-label="Toggle high contrast mode"
-        aria-pressed={highContrast}
+        aria-pressed={settings.highContrast}
       >
         <Contrast className="w-5 h-5" aria-hidden="true" />
       </Button>

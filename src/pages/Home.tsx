@@ -16,7 +16,7 @@ const Home = () => {
     const greetUser = async () => {
       // Speak English first
       await speakWithTTS({
-        text: "Welcome to EduEqui AI! Education for everyone.",
+        text: "Welcome to EduEqui! Education for everyone.",
         languageCode: 'en-US'
       });
       
@@ -87,6 +87,10 @@ const Home = () => {
                   title="Multilingual Support"
                   titleTamil="பல மொழி ஆதரவு"
                   description="Learn in Tamil, English, or both languages simultaneously"
+                  colorClass="gradient-blue"
+                  textColor="text-blue"
+                  iconBg="bg-blue/10"
+                  iconColor="text-blue"
                 />
                 
                 <FeatureCard
@@ -94,6 +98,10 @@ const Home = () => {
                   title="For All Abilities"
                   titleTamil="அனைத்து திறன்களும்"
                   description="Designed for blind, deaf, mobility, and cognitive needs"
+                  colorClass="gradient-purple"
+                  textColor="text-purple"
+                  iconBg="bg-purple/10"
+                  iconColor="text-purple"
                 />
                 
                 <FeatureCard
@@ -101,6 +109,10 @@ const Home = () => {
                   title="AI-Powered"
                   titleTamil="AI வழங்கும்"
                   description="Personalized learning paths adapted to your pace"
+                  colorClass="gradient-orange"
+                  textColor="text-orange"
+                  iconBg="bg-orange/10"
+                  iconColor="text-orange"
                 />
               </div>
             </motion.div>
@@ -129,22 +141,36 @@ const Home = () => {
   );
 };
 
-const FeatureCard = ({ icon: Icon, title, titleTamil, description }: {
+const FeatureCard = ({ 
+  icon: Icon, 
+  title, 
+  titleTamil, 
+  description,
+  colorClass = "gradient-blue",
+  textColor = "text-blue",
+  iconBg = "bg-blue/10",
+  iconColor = "text-blue"
+}: {
   icon: any;
   title: string;
   titleTamil: string;
   description: string;
+  colorClass?: string;
+  textColor?: string;
+  iconBg?: string;
+  iconColor?: string;
 }) => (
   <motion.div
-    whileHover={{ y: -10 }}
-    className="p-8 bg-card rounded-3xl border-2 border-primary/20 shadow-elegant"
+    whileHover={{ y: -10, scale: 1.02 }}
+    className={`p-8 bg-card rounded-3xl border-2 ${colorClass.includes('gradient') ? 'border-transparent' : `border-${textColor.replace('text-', '')}/30`} shadow-elegant relative overflow-hidden`}
   >
-    <div className="flex flex-col items-center text-center gap-4">
-      <div className="p-6 bg-primary/10 rounded-full">
-        <Icon className="w-12 h-12 text-primary" aria-hidden="true" />
+    <div className={`absolute inset-0 ${colorClass} opacity-5`}></div>
+    <div className="relative flex flex-col items-center text-center gap-4">
+      <div className={`p-6 ${iconBg} rounded-full`}>
+        <Icon className={`w-12 h-12 ${iconColor}`} aria-hidden="true" />
       </div>
-      <h3 className="text-xl font-bold text-primary">{titleTamil}</h3>
-      <h4 className="text-2xl font-bold">{title}</h4>
+      <h3 className={`text-xl font-bold ${textColor}`}>{titleTamil}</h3>
+      <h4 className={`text-2xl font-bold ${textColor}`}>{title}</h4>
       <p className="text-lg text-muted-foreground">{description}</p>
     </div>
   </motion.div>

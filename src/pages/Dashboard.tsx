@@ -128,6 +128,7 @@ const Dashboard = () => {
                       difficulty={course.difficulty}
                       progress={course.progress}
                       onClick={() => handleCourseClick(course.id)}
+                      colorIndex={index}
                     />
                   </motion.div>
                 ))}

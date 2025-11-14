@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-3 gap-6 text-center md:text-left">
           <div>
             <h3 className="text-xl font-bold text-primary mb-2">
-              SahayLearn AI
+              EduEqui
             </h3>
             <p className="text-lg text-muted-foreground">
               Inclusive learning for all
@@ -18,15 +18,15 @@ const Footer = () => {
             <h4 className="text-xl font-semibold mb-2">Contact Us</h4>
             <div className="flex flex-col gap-2">
               <a 
-                href="mailto:support@sahaylearn.ai" 
+                href="mailto:support@eduequi.com" 
                 className="flex items-center gap-2 text-lg hover:text-primary transition-colors justify-center md:justify-start"
-                aria-label="Email us at support@sahaylearn.ai"
+                aria-label="Email us at support@eduequi.com"
               >
                 <Mail className="w-5 h-5" aria-hidden="true" />
-                support@sahaylearn.ai
+                support@eduequi.com
               </a>
               <a 
-                href="https://github.com/sahaylearn" 
+                href="https://github.com/eduequi" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-lg hover:text-primary transition-colors justify-center md:justify-start"
@@ -46,7 +46,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-6 pt-6 border-t border-border text-center text-lg text-muted-foreground">
-          © 2025 SahayLearn AI. All rights reserved.
+          © 2025 EduEqui. All rights reserved.
         </div>
       </div>
     </footer>
