@@ -1,1 +1,1 @@
-# EduEqui
+# EduEqui-learing
