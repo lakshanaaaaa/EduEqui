@@ -1,5 +1,7 @@
 # EduEqui - Accessible Educational Platform
 
+> 🏆 **Built in 36 hours** - My first hackathon project!
+
 An inclusive, bilingual educational platform designed to provide accessible learning experiences for students with disabilities. Built with React, Flask, and MongoDB.
 
 ## 🌟 Features
@@ -240,9 +242,28 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 This project is licensed under the MIT License.
 
-## 👥 Authors
+## 👥 Author
 
-- Development Team - EduEqui
+Built with passion during my first 36-hour hackathon! 🚀
+
+This project represents my journey into creating accessible technology that makes a real difference in education.
+
+## 💡 Hackathon Journey
+
+This project was developed during an intense 36-hour hackathon - my very first one! The goal was to create an educational platform that truly serves students with disabilities, providing them with equal access to quality education through technology.
+
+### What I Learned
+- Building full-stack applications under time pressure
+- Implementing accessibility features from the ground up
+- Working with bilingual content (English/Tamil)
+- Integrating multiple technologies into a cohesive platform
+- The importance of inclusive design in education
+
+### Challenges Overcome
+- Implementing real-time Text-to-Speech for multiple languages
+- Creating an intuitive UI that works with assistive technologies
+- Managing authentication and user profiles with accessibility preferences
+- Building a scalable course and lesson management system
 
 ## 🙏 Acknowledgments
 
